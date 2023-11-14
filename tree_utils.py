@@ -108,6 +108,11 @@ class InternalDecisionNode(object):
         '''
         T, F = x_TF.shape
 
+        # Establishing Base Case
+        if self.left_child is None and self.right_child is None:
+            return self.y_N.mean() * np.ones(T, dtype=np.float64)
+
+
         # TODO determine which of the input T examples belong to the 
         # left child and which belong to the right
         # Hint: use this node's "feat_id" and "thresh_val" attributes
@@ -178,10 +183,8 @@ class LeafNode(object):
             Predicted y value for each provided example
         '''
         T = x_TF.shape[0]
-        # TODO return one array with prediction determined by training set
-        # Hint: Use this node's attribute "y_N", accessed by "self.y_N"
-        # This is an array of all y values that reach this leaf in train set.
-        yhat_T = -1.2345 * np.ones(T) # TODO fixme
+        
+        yhat_T = self.y_N.mean() * np.ones(T) # TODO fixme
         return yhat_T
 
 

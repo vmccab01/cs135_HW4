@@ -108,21 +108,28 @@ class InternalDecisionNode(object):
         '''
         T, F = x_TF.shape
 
-        # Establishing Base Case
-        if self.left_child is None and self.right_child is None:
-            return self.y_N.mean() * np.ones(T, dtype=np.float64)
-
-
         # TODO determine which of the input T examples belong to the 
         # left child and which belong to the right
         # Hint: use this node's "feat_id" and "thresh_val" attributes
 
+        ## pseudo code do xleft_mask_N = x_NF[:, feat_id] < thresh_val
+        # right_mask_N = np.logical_not(left_mask_N)
+
+        left_mask_T = x_TF[:, feat_id] < thresh_val
+        right_mask_T = np.logical_not(left_mask_T)
+
         # TODO ask the left child for its predictions (call 'predict')
         # TODO ask the right child for its predictions (call 'predict')
         
+        left_kid_pred = self.left_child.predict(x_TF[left_mask_T, :])
+        right_kid_pred = self.right_child.predict(x_TF[right_mask_T, :])
+
         # TODO aggregate all predictions and return one array
         # Hint: Make sure to preserve the order of examples as in the input.
-        yhat_T = 1.2345 * np.ones(T, dtype=np.float64) # TODO fixme
+        yhat_T = np.zeros(T, dtype=np.float64)
+        yhat_T[left_mask_T] = left_kid_pred
+        yhat_T[right_mask_T] = right_kid_pred
+        #yhat_T = 1.2345 * np.ones(T, dtype=np.float64) # TODO fixme
         return yhat_T
 
 
@@ -184,7 +191,7 @@ class LeafNode(object):
         '''
         T = x_TF.shape[0]
         
-        yhat_T = self.y_N.mean() * np.ones(T) # TODO fixme
+        yhat_T = self.y_N.mean() * np.ones(T) 
         return yhat_T
 
 
@@ -228,3 +235,5 @@ if __name__ == '__main__':
     print("Predictions of the right leaf for each example in training set:")
     yhat_N = right_leaf.predict(x_NF)
     print(np.round(yhat_N, 4))
+    print("# Predictions for new input never seen before")
+    print(np.round(root.predict(x_NF[::-1] + 1.23), 4))

@@ -139,7 +139,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         thresh_val_F[f] = possib_xthresh_V[chosen_v_id]
 
     # Determine single best feature to use
-    best_feat_id = np.argmin(cost_F)
+    best_feat_id = int(np.argmin(cost_F))
     best_thresh_val = thresh_val_F[best_feat_id]
     
     if not np.isfinite(cost_F[best_feat_id]):

@@ -124,6 +124,11 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         right_cost_V = np.ones(V) # TODO fixme
         total_cost_V = left_cost_V + right_cost_V
 
+        # if assert zero comes out true is that like an assert or is it no split
+
+        # If thresh val or feat id is none 
+
+
         # Check if there is any split that improves our cost or predictions.
         # If not, all splits will have same cost and we should just not split.
         costs_all_the_same = np.allclose(total_cost_V, total_cost_V[0])

@@ -108,14 +108,14 @@ class InternalDecisionNode(object):
         '''
         T, F = x_TF.shape
 
-        # TODO determine which of the input T examples belong to the 
-        # left child and which belong to the right
-        # Hint: use this node's "feat_id" and "thresh_val" attributes
 
-        ## pseudo code do xleft_mask_N = x_NF[:, feat_id] < thresh_val
-        # right_mask_N = np.logical_not(left_mask_N)
+        # accounting for left/right child being none so please implement
+        # even tho idk how yet
+        # if self.left_child is None:
+        # right child would get the value of 
 
-        left_mask_T = x_TF[:, feat_id] < thresh_val
+
+        left_mask_T = x_TF[:, self.feat_id] < self.thresh_val
         right_mask_T = np.logical_not(left_mask_T)
 
         # TODO ask the left child for its predictions (call 'predict')

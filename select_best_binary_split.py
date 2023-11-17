@@ -2,6 +2,16 @@ import numpy as np
 
 from tree_utils import LeafNode, InternalDecisionNode
 
+def calculate_gini(y_G):
+    # Function for calculating gini
+    if len(y_G) == 0:
+        return 0.0
+    p_1 = np.sum(y_G == 1) / len(y_G)
+    p_0 = 1 - p_1
+    gini = 1 - (p_0**2 + p_1**2)
+    return gini
+
+
 def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     ''' Determine best single feature binary split for provided dataset
 
@@ -118,11 +128,29 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         # Your goal is *correctness*, don't prioritize speed or efficiency yet.
         # Hint: You may need several lines of code, maybe a for loop.
         # Hint 2: look below at how we assemble the left and right child 
-        left_yhat_V = np.zeros(V) # TODO fixme
-        right_yhat_V = np.ones(V) # TODO fixme
-        left_cost_V = np.zeros(V) # TODO fixme
-        right_cost_V = np.ones(V) # TODO fixme
-        total_cost_V = left_cost_V + right_cost_V
+        left_yhat_V = np.zeros(V)
+        right_yhat_V = np.ones(V)
+        
+        # Loop through each possible threshold
+        for v, thresh_val in enumerate(possib_xthresh_V):
+            left_mask = x_NF[:, f] < thresh_val
+            right_mask = ~left_mask
+            
+            left_y = y_N[left_mask]
+            right_y = y_N[right_mask]
+            
+            # Calculate Gini impurity for left and right child
+            left_yhat_V[v] = calculate_gini(left_y)
+            right_yhat_V[v] = calculate_gini(right_y)
+        
+        # Calculate total Gini impurity for each threshold
+        total_cost_V = (left_yhat_V * (left_yhat_V.sum(axis=0) / N) +
+                        right_yhat_V * (right_yhat_V.sum(axis=0) / N))
+        
+        # Find the split candidate that has the best Gini impurity
+        chosen_v_id = np.argmin(total_cost_V)
+        cost_F[f] = total_cost_V[chosen_v_id]
+        thresh_val_F[f] = possib_xthresh_V[chosen_v_id]
 
         # if assert zero comes out true is that like an assert or is it no split
 
@@ -138,10 +166,10 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
             cost_F[f] = np.inf
             continue
         
-        # TODO pick out the split candidate that has best cost
-        chosen_v_id = -1 # TODO fixme
-        cost_F[f] = total_cost_V[chosen_v_id]
-        thresh_val_F[f] = possib_xthresh_V[chosen_v_id]
+        # # TODO pick out the split candidate that has best cost
+        # chosen_v_id = -1 # TODO fixme
+        # cost_F[f] = total_cost_V[chosen_v_id]
+        # thresh_val_F[f] = possib_xthresh_V[chosen_v_id]
 
     # Determine single best feature to use
     best_feat_id = int(np.argmin(cost_F))
@@ -168,11 +196,32 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
 
 
 if __name__ == '__main__':
-    # Example 4: binary split isn't possible (because all y same)
-    N = 5
-    F = 3
-    prng = np.random.RandomState(0)
-    x_NF = prng.rand(N, F)
-    y_N  = 1.2345 * np.ones(N)
-    feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
-    feat_id is None    
+    # # Example 1a: Simple example with F=1 and sorted features input
+    # N = 6
+    # F = 1
+    # x_NF = np.asarray([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]).reshape((6, 1))
+    # y_N  = np.asarray([0.0, 0.0, 0.0, 1.0, 1.0, 1.0])
+    # feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
+    # print(feat_id)
+    # print(thresh_val) 
+
+    #    #Example 2
+    # N = 6
+    # F = 13
+    # prng = np.random.RandomState(0)
+    # x_N1 = np.asarray([0.0, 1.0, 2.0, 3.0, 4.0, 5.0]).reshape((6,1))
+    # x_NF = np.hstack([prng.randn(N, F//2), x_N1, np.zeros((N, F//2))])
+    # y_N  = np.asarray([0.0, 0.0, 0.0, 1.0, 1.0, 1.0])
+    # feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
+    # print(feat_id)
+    # print(thresh_val)
+
+
+    # # Example 4: binary split isn't possible (because all y same)
+    # N = 5
+    # F = 3
+    # prng = np.random.RandomState(0)
+    # x_NF = prng.rand(N, F)
+    # y_N  = 1.2345 * np.ones(N)
+    # feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
+    # print(feat_id is None)    

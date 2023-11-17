@@ -164,3 +164,15 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     # assert np.allclose(cost_F[best_feat_id], left_cost + right_cost)
 
     return (best_feat_id, best_thresh_val, x_LF, y_L, x_RF, y_R)
+
+
+
+if __name__ == '__main__':
+    # Example 4: binary split isn't possible (because all y same)
+    N = 5
+    F = 3
+    prng = np.random.RandomState(0)
+    x_NF = prng.rand(N, F)
+    y_N  = 1.2345 * np.ones(N)
+    feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
+    feat_id is None    

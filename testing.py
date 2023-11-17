@@ -1,8 +1,8 @@
-from tree_utils import InternalDecisionNode, LeafNode
 import numpy as np
 import unittest
+from tree_utils import InternalDecisionNode, LeafNode
 
-class TestInternalDecisionNode(unittest.TestCase):
+class TestDecisionTreeNodes(unittest.TestCase):
     def test_predict_with_leaf_children(self):
         # Test when both left and right children are leaf nodes
         x_NF = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]])
@@ -21,6 +21,8 @@ class TestInternalDecisionNode(unittest.TestCase):
 
         # Expected predictions based on the threshold
         expected_yhat_T = np.array([0.5, 1.0])
+        # print(expected_yhat_T)
+        # print(yhat_T)
         np.testing.assert_allclose(yhat_T, expected_yhat_T, atol=1e-3)
 
     def test_predict_with_internal_children(self):
@@ -41,6 +43,8 @@ class TestInternalDecisionNode(unittest.TestCase):
 
         # Expected predictions based on the threshold and feature id
         expected_yhat_T = np.array([0.5, 1.0])
+        print(expected_yhat_T)
+        print(yhat_T)
         np.testing.assert_allclose(yhat_T, expected_yhat_T, atol=1e-3)
 
     def test_str_representation(self):
@@ -60,7 +64,9 @@ class TestInternalDecisionNode(unittest.TestCase):
             "  Y: Leaf: predict y = 0.000\n"
             "  N: Leaf: predict y = 1.000"
         )
-
+        
+        #print(expected_str)
+        #print(str(node))
         self.assertEqual(str(node), expected_str)
 
 if __name__ == '__main__':

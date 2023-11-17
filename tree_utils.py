@@ -109,27 +109,47 @@ class InternalDecisionNode(object):
         T, F = x_TF.shape
 
 
-        # accounting for left/right child being none so please implement
-        # even tho idk how yet
-        # if self.left_child is None:
-        # right child would get the value of 
-
-
+        # Left and Right masks
+        # print(type(self.left_child))
+        # print(type(self.right_child))
         left_mask_T = x_TF[:, self.feat_id] < self.thresh_val
-        right_mask_T = np.logical_not(left_mask_T)
+        right_mask_T = x_TF[:, self.feat_id] >= self.thresh_val
+        #right_mask_T = np.logical_not(left_mask_T)
+        ## covering if one or both children does not exist
 
-        # TODO ask the left child for its predictions (call 'predict')
-        # TODO ask the right child for its predictions (call 'predict')
+        if self.left_child is not None:
+            # print('left child')
+            left_kid_pred = self.left_child.predict(x_TF[left_mask_T, :])
+            # print('left child done')
+        else:
+            left_kid_pred = np.zeros(np.sum(left_mask_T), dtype=np.float64)
         
-        left_kid_pred = self.left_child.predict(x_TF[left_mask_T, :])
-        right_kid_pred = self.right_child.predict(x_TF[right_mask_T, :])
+        if self.right_child is not None:
+            # print('right child')
+            right_kid_pred = self.right_child.predict(x_TF[right_mask_T, :])
+            # print('right child done')
+        else:
+            right_kid_pred = np.zeros(np.sum(right_mask_T), dtype=np.float64)
 
-        # TODO aggregate all predictions and return one array
-        # Hint: Make sure to preserve the order of examples as in the input.
+        if self.left_child is None and self.right_child is None:
+            return LeafNode.predict(self, x_TF)
+        ## Return yhat
+
         yhat_T = np.zeros(T, dtype=np.float64)
         yhat_T[left_mask_T] = left_kid_pred
         yhat_T[right_mask_T] = right_kid_pred
-        #yhat_T = 1.2345 * np.ones(T, dtype=np.float64) # TODO fixme
+
+
+        # print('Left Mask:')
+        # print(left_mask_T)
+        # print('Right Mask:')
+        # print(right_mask_T)
+        # print('Left Kid Pred:')
+        # print(left_kid_pred)
+        # print('Right Kid Pred:')
+        # print(right_kid_pred)
+        # print('yhat_T')
+        # print(yhat_T)
         return yhat_T
 
 
@@ -191,7 +211,11 @@ class LeafNode(object):
         '''
         T = x_TF.shape[0]
         
-        yhat_T = self.y_N.mean() * np.ones(T) 
+        yhat_T = np.mean(self.y_N) * np.ones(T)
+        # print('y_N in leaf')
+        # print(self.y_N)
+        # print('yhat_T in leaf')
+        # print(yhat_T) 
         return yhat_T
 
 

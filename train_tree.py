@@ -58,5 +58,6 @@ def train_tree_greedy(
             # TODO recursively call train_tree_greedy to build the right child
             right_child = train_tree_greedy(
                 x_RF, y_R, depth + 1, MAX_DEPTH, MIN_SAMPLES_INTERNAL, MIN_SAMPLES_LEAF)
+            
             return InternalDecisionNode(
                 x_NF, y_N, feat_id, thresh_val, left_child, right_child)
